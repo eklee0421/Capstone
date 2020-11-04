@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="my_array">
-        <item>아이템0</item>
-        <item>아이템1</item>
-        <item>아이템2</item>
-        <item>아이템3</item>
-        <item>아이템4</item>
+        <item>현재 위치</item>
+        <item>서울 강서구</item>
+        <item>서울 강남구</item>
+        <item>서울 양천구</item>
+        <item>서울 은평구</item>
+        <item>서울 강북구</item>
     </string-array>
 </resources>
