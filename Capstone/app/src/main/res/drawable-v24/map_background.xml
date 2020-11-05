@@ -4,7 +4,7 @@
 
     <!-- #E4F7BA" 색으로 채움 -->
     <solid
-        android:color="#476600"/>
+        android:color="#B387D6"/>
 
     <!-- 1dp 크기의 #6B9900 색 테두리 -->
     <stroke

@@ -1,6 +1,7 @@
 package org.techtown.capstone;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
     GoogleMap map;
 
     MarkerOptions myLocationMarker;
+    int val = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,25 +61,29 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
 
+                if(val == -1) mes();
+                else {startActivityForResult(intent, val);}
             }
         });
 
         AutoPermissions.Companion.loadAllPermissions(this, 101);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //스피너 선택시
-                if(position == 0) startLocationService();
-                else if(position == 1)  gogoMap(37.33367, 126.49311);
-                else if(position == 2)  gogoMap(37.29529, 127.01396);
-                else if(position == 3)  gogoMap(37.31126, 126.51104);
-                else if(position == 4)  gogoMap(37.36397, 126.55470);
-                else if(position == 5)  gogoMap(37.38166, 127.01318);
+                if(position == 0) {
+                    startLocationService(); val = -1;
+                }
+                else if(position == 1)  {gogoMap(37.560166, 126.825423, "서울", "강서구"); val = 1;}
+                else if(position == 2)  {gogoMap(37.498228, 127.027708, "서울", "강남구"); val = 2;}
+                else if(position == 3)  {gogoMap(37.526110, 126.864807, "서울", "양천구"); val = 3;}
+                else if(position == 4)  {gogoMap(37.611042, 126.929507, "서울", "은평구"); val = 4;}
+                else if(position == 5)  {gogoMap(37.638056, 127.025605, "서울", "강북구"); val = 5;}
             }
 
             @Override
@@ -89,11 +95,10 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
 
     }
 
-    public void gogoMap(double latitude, double longitude) {
+    public void gogoMap(double latitude, double longitude, String lo, String cation) {
 
         // 맵 위치를 이동하기
         CameraUpdate update = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
-
         // 위도,경도
         map.moveCamera(update);
 
@@ -105,8 +110,8 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
         MarkerOptions markerOptions = new MarkerOptions()
                 // 마커 위치
                 .position(new LatLng(latitude, longitude))
-                .title("Great DavidJ!") // 말풍선 주 내용
-                .snippet("Really Great!"); // 말풍선 보조내용
+                .title(lo) // 말풍선 주 내용
+                .snippet(cation); // 말풍선 보조내용
 
 
         // 마커를 추가하고 말풍선 표시한 것을 보여주도록 호출
@@ -128,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             }
 
             GPSListener gpsListener = new GPSListener();
-            long minTime = 10000;
+            long minTime = 1000000000;
             float minDistance = 0;
 
             manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, gpsListener);
@@ -169,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             myLocationMarker.position(curPoint);
             myLocationMarker.title("● 내 위치\n");
             myLocationMarker.snippet("● GPS로 확인한 위치");
-            myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.mylocation));
+            //myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.mylocation));
             map.addMarker(myLocationMarker);
         } else {
             myLocationMarker.position(curPoint);
@@ -185,12 +190,16 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
 
     @Override
     public void onDenied(int requestCode, String[] permissions) {
-        Toast.makeText(this, "permissions denied : " + permissions.length, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "permissions denied : " + permissions.length, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onGranted(int requestCode, String[] permissions) {
-        Toast.makeText(this, "permissions granted : " + permissions.length, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "permissions granted : " + permissions.length, Toast.LENGTH_LONG).show();
+    }
+
+    public void mes() {
+        Toast.makeText(this, "위치를 선택하세요", Toast.LENGTH_LONG).show();
     }
 
 }
