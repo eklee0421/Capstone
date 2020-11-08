@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -69,9 +70,67 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
         });
 
         AutoPermissions.Companion.loadAllPermissions(this, 101);
+        Spinner spinner1 = (Spinner) findViewById(R.id.spinner1);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        final ArrayAdapter<CharSequence> adspin1;
+        adspin1 = ArrayAdapter.createFromResource(this, R.array.my_city, android.R.layout.simple_spinner_dropdown_item);
+        adspin1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner1.setAdapter(adspin1);
+
+        spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if(adspin1.getItem(position).equals("서울")){
+                    final ArrayAdapter<CharSequence> adspin2;
+                    adspin2 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_seoul, android.R.layout.simple_spinner_dropdown_item);
+                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    Spinner spinner2 = (Spinner) findViewById(R.id.spinner2);
+                    spinner2.setAdapter(adspin2);
+                    spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                            if(adspin2.getItem(position).equals("강서구")){
+                                final ArrayAdapter<CharSequence> adspin3;
+                                adspin3 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_gangsu, android.R.layout.simple_spinner_dropdown_item);
+                                adspin3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                Spinner spinner3 = (Spinner) findViewById(R.id.spinner3);
+                                spinner3.setAdapter(adspin3);
+                                spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                    @Override
+                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                        if(adspin3.getItem(position).equals("마곡역")){
+                                            gogoMap(37.560166, 126.825423, "서울", "강서구"); val = 1;
+                                        }
+                                        else if(adspin3.getItem(position).equals("화곡역")){
+                                            gogoMap(37.498228, 127.027708, "서울", "강남구"); val = 2;
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onNothingSelected(AdapterView<?> parent) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        /*
+        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -91,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                 //선택되지 않으면
                 startLocationService();
             }
-        });
+        });*/
 
     }
 

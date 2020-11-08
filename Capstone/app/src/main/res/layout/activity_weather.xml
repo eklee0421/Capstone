@@ -12,22 +12,7 @@ tools:context=".WeatherActivity">
         android:layout_height="0dp"
         android:layout_weight="20"
         android:gravity="bottom|left"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_weight="65"
-            android:text="@string/weather_name" />
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_weight="35"
-            android:text="@string/road_name" />
-    </LinearLayout>
+        android:orientation="horizontal"/>
 
 <FrameLayout
     android:layout_width="match_parent"
@@ -36,17 +21,4 @@ tools:context=".WeatherActivity">
 
 </FrameLayout>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="20"
-    android:gravity="center|center_horizontal|top"
-    android:orientation="vertical">
-
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nowCCTV_name" />
-</LinearLayout>
 </LinearLayout>
