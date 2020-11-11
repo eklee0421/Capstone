@@ -58,12 +58,15 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             e.printStackTrace();
         }
 
+        final String myLocation="location";
+
         Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
 
+                intent.putExtra(myLocation,val);
                 if(val == -1) mes();
                 else {startActivityForResult(intent, val);}
             }
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                if(position == 0) startLocationService();
                 if(adspin1.getItem(position).equals("서울")){
                     final ArrayAdapter<CharSequence> adspin2;
                     adspin2 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_seoul, android.R.layout.simple_spinner_dropdown_item);
@@ -101,10 +104,10 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                     @Override
                                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                         if(adspin3.getItem(position).equals("마곡역")){
-                                            gogoMap(37.560166, 126.825423, "서울", "강서구"); val = 1;
+                                            gogoMap(37.560166, 126.825423, "서울 강서구", "마곡역"); val = 1;
                                         }
-                                        else if(adspin3.getItem(position).equals("화곡역")){
-                                            gogoMap(37.498228, 127.027708, "서울", "강남구"); val = 2;
+                                        else if(adspin3.getItem(position).equals("우장산역")){
+                                            gogoMap(37.549293, 126.836634, "서울 강서구", "우장산역"); val = 2;
                                         }
                                     }
 

@@ -13,16 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".WeatherActivity"></activity>
-        <activity android:name=".WheaterActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCGnuidP1mO8nCm7e73JTbtLqwwLBNaxoo" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"> </activity>
+
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
