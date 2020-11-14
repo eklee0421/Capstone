@@ -103,8 +103,26 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                 spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                     @Override
                                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
                                         if(adspin3.getItem(position).equals("마곡역")){
-                                            gogoMap(37.560166, 126.825423, "서울 강서구", "마곡역"); val = 1;
+                                            final ArrayAdapter<CharSequence> adspin4;
+                                            adspin4 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_gangsu, android.R.layout.simple_spinner_dropdown_item);
+                                            adspin4.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                            Spinner spinner4 = (Spinner) findViewById(R.id.spinner4);
+                                            spinner4.setAdapter(adspin4);
+                                            spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                                @Override
+                                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                                    
+                                                    gogoMap(37.560166, 126.825423, "서울 강서구", "마곡역"); val = 1;
+                                                }
+
+                                                @Override
+                                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                                }
+                                            });
+
                                         }
                                         else if(adspin3.getItem(position).equals("우장산역")){
                                             gogoMap(37.549293, 126.836634, "서울 강서구", "우장산역"); val = 2;
