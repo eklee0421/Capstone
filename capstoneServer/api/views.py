@@ -9,7 +9,6 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import time
-#from bson import json_util, ObjectId
 
 @api_view(['GET'])
 def ping(request):
@@ -23,8 +22,8 @@ def geography(request):
     if request.method == 'POST':
         jsonVal = request.data
         latitude = jsonVal['latitude']
-        logitude = jsonVal['longitude']
+        longitude = jsonVal['longitude']
         return JsonResponse({
             "latitude" : latitude,
-            "logitude" : logitude
+            "longitude" : longitude
         })
