@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -22,14 +23,36 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.pedro.library.AutoPermissions;
 import com.pedro.library.AutoPermissionsListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+
 public class MainActivity extends AppCompatActivity implements AutoPermissionsListener {
+
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:8000/")
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
 
     SupportMapFragment mapFragment;
     GoogleMap map;
@@ -37,10 +60,15 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
     MarkerOptions myLocationMarker;
     int val = -1;
 
+    public double latitude = 0;
+    public double longitude = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -58,63 +86,138 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             e.printStackTrace();
         }
 
-        final String myLocation="location";
+        final String myLocation = "location";
 
         Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                RetrofitService service = retrofit.create(RetrofitService.class);
+
+                try {
+                    JSONObject b = new JSONObject();
+                    b.put("latitude", latitude);
+                    b.put("longitude", longitude);
+
+                    Call<PostResult> call = service.getPosts(new geoData(54.12323, 121.12312));
+                    call.enqueue(new Callback<PostResult>() {
+                        @Override
+                        public void onResponse(Call<PostResult> call, retrofit2.Response<PostResult> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<PostResult> call, Throwable t) {
+
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                //Toast toast = Toast.makeText(getApplicationContext(), Double.toString(latitude), Toast.LENGTH_LONG);
+                //toast.show();
+                //Toast toast2 = Toast.makeText(getApplicationContext(), Double.toString(longitude), Toast.LENGTH_LONG);
+                //toast2.show();
+
                 Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
 
-                intent.putExtra(myLocation,val);
+                //intent.putExtra("latitude", latitude);
+                //intent.putExtra("longitude", longitude);
+                //intent.putExtra("weather", postResult.nowWeather);
+
                 if(val == -1) mes();
                 else {startActivityForResult(intent, val);}
+
             }
         });
 
         AutoPermissions.Companion.loadAllPermissions(this, 101);
-        Spinner spinner1 = (Spinner) findViewById(R.id.spinner1);
+        //Spinner spinner1 = (Spinner) findViewById(R.id.spinner1);
 
-        final ArrayAdapter<CharSequence> adspin1;
-        adspin1 = ArrayAdapter.createFromResource(this, R.array.my_city, android.R.layout.simple_spinner_dropdown_item);
+        final List<String> areas1 = new ArrayList<String>();
+
+        DatabaseReference rootReference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference cityReference = rootReference.child("");
+
+
+        rootReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                for (DataSnapshot areaSnapshot : snapshot.getChildren()) {
+                    String areaName = areaSnapshot.child("서울특별시").getValue(String.class);
+                    areas1.add(areaName);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("TAG: ", "Failed to read value", error.toException());
+            }
+        });
+
+
+        final ArrayAdapter<CharSequence> adspin1 = ArrayAdapter.createFromResource(MainActivity.this, R.array.도시들, android.R.layout.simple_spinner_dropdown_item);
         adspin1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner spinner1 = (Spinner) findViewById(R.id.spinner1);
         spinner1.setAdapter(adspin1);
-
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0) startLocationService();
-                if(adspin1.getItem(position).equals("서울")){
+                final String strCity = adspin1.getItem(position).toString();
+                if (position == 0) startLocationService();
+                else if (adspin1.getItem(position).equals(strCity)) {
                     final ArrayAdapter<CharSequence> adspin2;
-                    adspin2 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_seoul, android.R.layout.simple_spinner_dropdown_item);
+                    String packageName = getPackageName();
+                    int resId = getResources().getIdentifier(strCity,"array",packageName);
+
+                    adspin2 = ArrayAdapter.createFromResource(MainActivity.this, resId, android.R.layout.simple_spinner_dropdown_item);
+
                     adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     Spinner spinner2 = (Spinner) findViewById(R.id.spinner2);
                     spinner2.setAdapter(adspin2);
                     spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            if(adspin2.getItem(position).equals("강서구")){
+                            final String strCity2 = adspin2.getItem(position).toString();
+                            if (adspin2.getItem(position).equals(strCity2)) {
                                 final ArrayAdapter<CharSequence> adspin3;
-                                adspin3 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_gangsu, android.R.layout.simple_spinner_dropdown_item);
+                                String packageName = getPackageName();
+                                int resId2 = getResources().getIdentifier(strCity2,"array",packageName);
+                                adspin3 = ArrayAdapter.createFromResource(MainActivity.this, resId2, android.R.layout.simple_spinner_dropdown_item);
                                 adspin3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                 Spinner spinner3 = (Spinner) findViewById(R.id.spinner3);
                                 spinner3.setAdapter(adspin3);
                                 spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                     @Override
                                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                                        if(adspin3.getItem(position).equals("마곡역")){
+                                        final String strCity3 = adspin3.getItem(position).toString();
+                                        if (adspin3.getItem(position).equals(strCity3)) {
                                             final ArrayAdapter<CharSequence> adspin4;
-                                            adspin4 = ArrayAdapter.createFromResource(MainActivity.this, R.array.spinner_gangsu, android.R.layout.simple_spinner_dropdown_item);
+                                            String packageName3 = getPackageName();
+                                            int resId3 = getResources().getIdentifier(strCity3,"array",packageName3);
+                                            adspin4 = ArrayAdapter.createFromResource(MainActivity.this, resId3, android.R.layout.simple_spinner_dropdown_item);
                                             adspin4.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                             Spinner spinner4 = (Spinner) findViewById(R.id.spinner4);
                                             spinner4.setAdapter(adspin4);
                                             spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                                 @Override
                                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                                    
-                                                    gogoMap(37.560166, 126.825423, "서울 강서구", "마곡역"); val = 1;
+                                                    final String strCity4 = adspin4.getItem(position).toString();
+                                                    if(adspin4.getItem(position).equals(strCity4)){
+                                                        final ArrayAdapter<CharSequence> adspin5;
+                                                        String packageName3 = getPackageName();
+                                                        int resId5 = getResources().getIdentifier(strCity4,"array",packageName3);
+                                                        adspin5 = ArrayAdapter.createFromResource(MainActivity.this, resId5, android.R.layout.simple_spinner_dropdown_item);
+                                                        latitude = Double.parseDouble(adspin5.getItem(0).toString());
+                                                        longitude = Double.parseDouble(adspin5.getItem(1).toString());
+                                                    }
+
+                                                    gogoMap(latitude, longitude, strCity+" "+strCity2+" "+strCity3,strCity4);
+                                                    val = 1;
                                                 }
 
                                                 @Override
@@ -123,9 +226,9 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                                 }
                                             });
 
-                                        }
-                                        else if(adspin3.getItem(position).equals("우장산역")){
-                                            gogoMap(37.549293, 126.836634, "서울 강서구", "우장산역"); val = 2;
+                                        } else if (adspin3.getItem(position).equals("우장산역")) {
+                                            gogoMap(37.549293, 126.836634, "서울 강서구", "우장산역");
+                                            val = 2;
                                         }
                                     }
 
@@ -150,28 +253,6 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
 
             }
         });
-        /*
-        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //스피너 선택시
-                if(position == 0) {
-                    startLocationService(); val = -1;
-                }
-                else if(position == 1)  {gogoMap(37.560166, 126.825423, "서울", "강서구"); val = 1;}
-                else if(position == 2)  {gogoMap(37.498228, 127.027708, "서울", "강남구"); val = 2;}
-                else if(position == 3)  {gogoMap(37.526110, 126.864807, "서울", "양천구"); val = 3;}
-                else if(position == 4)  {gogoMap(37.611042, 126.929507, "서울", "은평구"); val = 4;}
-                else if(position == 5)  {gogoMap(37.638056, 127.025605, "서울", "강북구"); val = 5;}
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                //선택되지 않으면
-                startLocationService();
-            }
-        });*/
 
     }
 
@@ -205,9 +286,9 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
         try {
             Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                String message = "최근 위치 -> Latitude : " + latitude + "\nLongitude:" + longitude;
+                double local_latitude = location.getLatitude();
+                double local_longitude = location.getLongitude();
+                String message = "최근 위치 -> Latitude : " + local_latitude + "\nLongitude:" + local_longitude;
 
                 Log.d("Map", message);
             }
@@ -218,31 +299,34 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
 
             manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, gpsListener);
 
-        } catch(SecurityException e) {
+        } catch (SecurityException e) {
             e.printStackTrace();
         }
     }
 
     class GPSListener implements LocationListener {
         public void onLocationChanged(Location location) {
-            Double latitude = location.getLatitude();
-            Double longitude = location.getLongitude();
+            Double local_latitude = location.getLatitude();
+            Double local_longitude = location.getLongitude();
 
-            String message = "내 위치 -> Latitude : "+ latitude + "\nLongitude:"+ longitude;
+            String message = "내 위치 -> Latitude : " + local_latitude + "\nLongitude:" + local_longitude;
             Log.d("Map", message);
 
-            showCurrentLocation(latitude, longitude);
+            showCurrentLocation(local_latitude, local_longitude);
         }
 
-        public void onProviderDisabled(String provider) { }
+        public void onProviderDisabled(String provider) {
+        }
 
-        public void onProviderEnabled(String provider) { }
+        public void onProviderEnabled(String provider) {
+        }
 
-        public void onStatusChanged(String provider, int status, Bundle extras) { }
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
     }
 
-    private void showCurrentLocation(Double latitude, Double longitude) {
-        LatLng curPoint = new LatLng(latitude, longitude);
+    private void showCurrentLocation(Double local_latitude, Double local_longitude) {
+        LatLng curPoint = new LatLng(local_latitude, local_longitude);
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15));
 
         showMyLocationMarker(curPoint);
