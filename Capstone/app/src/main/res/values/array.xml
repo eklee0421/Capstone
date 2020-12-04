@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="도시들">
-        <item>현재 위치</item>
+        <!--item>현재 위치</item-->
         <item>경기도</item>
         <item>서울특별시</item>
         <item>인천광역시</item>
@@ -1447,8 +1447,8 @@
     </string-array>
 
     <string-array name = "수도권제1순환선불암터널퇴계원방향">
-        <item>127.08818</item>
         <item>37.675102</item>
+        <item>127.08818</item>
     </string-array>
 
     <string-array name = "상계동">

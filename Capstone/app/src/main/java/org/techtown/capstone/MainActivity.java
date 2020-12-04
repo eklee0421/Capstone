@@ -47,7 +47,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity implements AutoPermissionsListener {
-
+    //애뮬레이터용: http://10.0.2.2:8000/
+    //apk용: http://192.168.25.3:8000/ - 우리집 기준
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8000/")
             .addConverterFactory(ScalarsConverterFactory.create())
@@ -62,8 +63,10 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
 
     public double latitude = 0;
     public double longitude = 0;
-
-
+    public int nowWeather = 0;
+    public String nowLocal = "";
+    public String videoUrl = "";
+    public double rain = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
         }
 
         final String myLocation = "location";
-
+        final PostResult postResult;
         Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,10 +103,33 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                     b.put("latitude", latitude);
                     b.put("longitude", longitude);
 
-                    Call<PostResult> call = service.getPosts(new geoData(54.12323, 121.12312));
+                    Call<PostResult> call = service.getPosts(new geoData(latitude, longitude));
                     call.enqueue(new Callback<PostResult>() {
                         @Override
                         public void onResponse(Call<PostResult> call, retrofit2.Response<PostResult> response) {
+                            if(response.isSuccessful()){
+                                Log.d("성공", response.body().toString());
+                                nowWeather = response.body().getNowWeather();
+                                videoUrl = response.body().getVideoUrl();
+                                rain = response.body().getRain();
+                                Log.d("??",videoUrl);
+                                //Toast toast = Toast.makeText(getApplicationContext(), "1번째"+videoUrl, Toast.LENGTH_LONG);
+                                //toast.show();
+                                //postResult = (postResult) response.getClass();
+                                if(val == -1) mes();
+                                else {
+                                    Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
+                                    intent.putExtra("local", nowLocal);
+                                    intent.putExtra("nowWeather", nowWeather);
+                                    intent.putExtra("videoUrl", videoUrl);
+                                    intent.putExtra("rain", rain);
+                                    Log.d("-----------------------",videoUrl);
+                                    startActivity(intent);
+                                }
+                            }
+                            else{
+                                Log.d("실패","값 반환 실패");
+                            }
 
                         }
 
@@ -122,14 +148,15 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                 //Toast toast2 = Toast.makeText(getApplicationContext(), Double.toString(longitude), Toast.LENGTH_LONG);
                 //toast2.show();
 
-                Intent intent = new Intent(getApplicationContext(), WeatherActivity.class);
 
                 //intent.putExtra("latitude", latitude);
                 //intent.putExtra("longitude", longitude);
-                //intent.putExtra("weather", postResult.nowWeather);
 
-                if(val == -1) mes();
-                else {startActivityForResult(intent, val);}
+                //Log.d("======================", videoUrl);
+                //Toast toast2 = Toast.makeText(getApplicationContext(), "2번째"+videoUrl, Toast.LENGTH_LONG);
+                //toast2.show();
+
+
 
             }
         });
@@ -159,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             }
         });
 
-
+        AutoPermissions.Companion.loadAllPermissions(this, 101);
         final ArrayAdapter<CharSequence> adspin1 = ArrayAdapter.createFromResource(MainActivity.this, R.array.도시들, android.R.layout.simple_spinner_dropdown_item);
         adspin1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner1 = (Spinner) findViewById(R.id.spinner1);
@@ -168,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 final String strCity = adspin1.getItem(position).toString();
-                if (position == 0) startLocationService();
-                else if (adspin1.getItem(position).equals(strCity)) {
+                //if (position == 0) startLocationService();
+                if (adspin1.getItem(position).equals(strCity)) {
                     final ArrayAdapter<CharSequence> adspin2;
                     String packageName = getPackageName();
                     int resId = getResources().getIdentifier(strCity,"array",packageName);
@@ -216,7 +243,8 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                                         longitude = Double.parseDouble(adspin5.getItem(1).toString());
                                                     }
 
-                                                    gogoMap(latitude, longitude, strCity+" "+strCity2+" "+strCity3,strCity4);
+                                                    gogoMap(latitude, longitude, strCity+" "+strCity2+" "+strCity3, strCity4);
+                                                    nowLocal = strCity+" "+strCity2+" "+strCity3;
                                                     val = 1;
                                                 }
 

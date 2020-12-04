@@ -10,10 +10,28 @@ public class PostResult {
     private double longitude;
 
     @SerializedName("nowWeather")
-    private double nowWeather;
+    private int nowWeather;
+
+    @SerializedName("rain")
+    private double rain;
+
+    @SerializedName("nowRoad")
+    private int nowroad;
+
+    @SerializedName("videoUrl")
+    private String videoUrl;
 
     @Override
     public String toString() {
-        return "PostResult{" + "latitude=" + latitude + '\'' + "longitude=" + longitude + '\'' + "nowWeather=" + nowWeather + '\'' +'}';
+        return "PostResult{" + "latitude=" + latitude + '\'' + "longitude=" + longitude + '\'' +
+                "nowWeather=" + nowWeather + '\'' +
+                "rain=" + rain + '\n' +
+                "nowroad=" + nowroad + '\n' +
+                "videoUrl=" + videoUrl + '\n' + '}';
     }
+
+    public int getNowWeather(){return nowWeather;}
+    public int getNowroad() {return nowroad;}
+    public String getVideoUrl() {return videoUrl;}
+    public double getRain() {return rain;}
 }

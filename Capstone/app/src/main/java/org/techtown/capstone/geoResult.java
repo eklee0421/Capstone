@@ -4,6 +4,9 @@ public class geoResult {
     private double latitude;
     private double longitude;
     private int nowWeather;
+    private int nowroad;
+    private double rain;
+    private String videoUrl;
 
     public double getLatitude() {
         return latitude;
@@ -14,4 +17,10 @@ public class geoResult {
     }
 
     public int getNowWeather() {return nowWeather;}
+
+    public int getNowroad() {return nowroad;}
+
+    public double getRain() {return rain;}
+
+    public String getVideoUrl() {return videoUrl;}
 }
