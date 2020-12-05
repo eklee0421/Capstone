@@ -31,4 +31,6 @@ urlpatterns = [
     path('api/doc/', get_swagger_view(title='Rest API Document')),
     path('api/v1/ping/', ping),
     path('api/v1/geo/', geography),
+    #
+    path('model/',call_model.as_view()),
 ]
