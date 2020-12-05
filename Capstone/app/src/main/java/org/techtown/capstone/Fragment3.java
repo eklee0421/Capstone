@@ -36,8 +36,6 @@ public class Fragment3 extends Fragment {
         svideo(videoUrl);
         final String vU = videoUrl;
 
-
-
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout)v.findViewById(R.id.swipe);
        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
            @Override

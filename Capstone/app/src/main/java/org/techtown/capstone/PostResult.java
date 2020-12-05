@@ -15,7 +15,7 @@ public class PostResult {
     @SerializedName("rain")
     private double rain;
 
-    @SerializedName("nowRoad")
+    @SerializedName("nowroad")
     private int nowroad;
 
     @SerializedName("videoUrl")

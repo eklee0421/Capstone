@@ -18,7 +18,6 @@ public class WeatherActivity extends AppCompatActivity {
     Fragment3 fragment3;
     //String packageName = getPackageName();
     //int res = getResources().getIdentifier("sunny","drawable",packageName);
-    int imageWeather[] = {R.drawable.sunny, R.drawable.cloud};
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -62,22 +61,25 @@ public class WeatherActivity extends AppCompatActivity {
         TextView textView = (TextView)findViewById(R.id.textView);
         textView.setText(nowLocal);
 
+        Bundle bundle1 = new Bundle();
+        bundle1.putInt("nowWeather",nowWeather);
+        bundle1.putDouble("rain",rain);
+        fragment1.setArguments(bundle1);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment1).commit();
 
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.addTab(tabs.newTab().setText("현재 날씨"));
         tabs.addTab(tabs.newTab().setText("도로 상황"));
         tabs.addTab(tabs.newTab().setText("실시간 날씨"));
-
+        /*
         Toast toast = Toast.makeText(getApplicationContext(),""+nowWeather, Toast.LENGTH_SHORT);
         toast.show();
 
         Toast toast1 = Toast.makeText(getApplicationContext(),""+rain, Toast.LENGTH_SHORT);
         toast1.show();
-
-        Toast toast2 = Toast.makeText(getApplicationContext(),""+nowroad, Toast.LENGTH_SHORT);
-        toast2.show();
-        //onImageSelected(nowWeather);
+*/
+        //Toast toast2 = Toast.makeText(getApplicationContext(),""+nowroad, Toast.LENGTH_SHORT);
+        //toast2.show();
 
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -87,15 +89,16 @@ public class WeatherActivity extends AppCompatActivity {
                 Log.d("WeatherActivity", "선택된 탭: " + position);
                 Fragment selected = null;
                 if(position == 0) {
+                    selected = fragment1;
                     Bundle bundle1 = new Bundle();
                     bundle1.putInt("nowWeather",nowWeather);
+                    bundle1.putDouble("rain",rain);
                     fragment1.setArguments(bundle1);
                     selected = fragment1;
                 }
                 else if(position == 1) {
                     Bundle bundle2 = new Bundle();
                     bundle2.putInt("nowroad",nowroad);
-                    bundle2.putDouble("rain",rain);
                     fragment2.setArguments(bundle2);
                     selected = fragment2;
                 }
@@ -119,9 +122,5 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    public void onImageSelected(int pos){
-        fragment1.setImage(imageWeather[pos]);
     }
 }

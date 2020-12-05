@@ -1,5 +1,6 @@
 package org.techtown.capstone;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -38,19 +39,35 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-
 public class MainActivity extends AppCompatActivity implements AutoPermissionsListener {
     //애뮬레이터용: http://10.0.2.2:8000/
     //apk용: http://192.168.25.3:8000/ - 우리집 기준
-    Retrofit retrofit = new Retrofit.Builder()
+    /*Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8000/")
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+*/
+
+
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.MINUTES)
+            .readTimeout(50, TimeUnit.SECONDS)
+            .writeTimeout(50,TimeUnit.SECONDS)
+            .build();
+
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://c0196bec2e52.ngrok.io")
+            .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build();
@@ -64,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
     public double latitude = 0;
     public double longitude = 0;
     public int nowWeather = 0;
+    public int nowroad = 0;
     public String nowLocal = "";
     public String videoUrl = "";
     public double rain = 0;
@@ -71,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -89,12 +106,19 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             e.printStackTrace();
         }
 
+
+
         final String myLocation = "location";
         final PostResult postResult;
         Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+                progressDialog.setMessage("현재 날씨를 불러오고 있습니다");
+                progressDialog.setCancelable(true);
+                progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Horizontal);
+                progressDialog.show();
 
                 RetrofitService service = retrofit.create(RetrofitService.class);
 
@@ -112,7 +136,8 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                 nowWeather = response.body().getNowWeather();
                                 videoUrl = response.body().getVideoUrl();
                                 rain = response.body().getRain();
-                                Log.d("??",videoUrl);
+                                nowroad = response.body().getNowroad();
+                                Log.d("도로========================================================",""+nowroad);
                                 //Toast toast = Toast.makeText(getApplicationContext(), "1번째"+videoUrl, Toast.LENGTH_LONG);
                                 //toast.show();
                                 //postResult = (postResult) response.getClass();
@@ -123,12 +148,15 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                     intent.putExtra("nowWeather", nowWeather);
                                     intent.putExtra("videoUrl", videoUrl);
                                     intent.putExtra("rain", rain);
+                                    intent.putExtra("nowroad",nowroad);
                                     Log.d("-----------------------",videoUrl);
+                                    progressDialog.dismiss();
                                     startActivity(intent);
                                 }
                             }
                             else{
                                 Log.d("실패","값 반환 실패");
+                                progressDialog.dismiss();
                             }
 
                         }
