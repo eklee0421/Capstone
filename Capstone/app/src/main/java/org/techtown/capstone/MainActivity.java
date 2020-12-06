@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
             .build();
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://c0196bec2e52.ngrok.io")
+            .baseUrl("http://75ccca410d1c.ngrok.io")
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                 videoUrl = response.body().getVideoUrl();
                                 rain = response.body().getRain();
                                 nowroad = response.body().getNowroad();
-                                Log.d("도로========================================================",""+nowroad);
+                                Log.d("서버 데이터 수신",response.getClass().toString());
                                 //Toast toast = Toast.makeText(getApplicationContext(), "1번째"+videoUrl, Toast.LENGTH_LONG);
                                 //toast.show();
                                 //postResult = (postResult) response.getClass();
@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements AutoPermissionsLi
                                     intent.putExtra("videoUrl", videoUrl);
                                     intent.putExtra("rain", rain);
                                     intent.putExtra("nowroad",nowroad);
-                                    Log.d("-----------------------",videoUrl);
                                     progressDialog.dismiss();
                                     startActivity(intent);
                                 }
